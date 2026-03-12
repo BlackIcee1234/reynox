@@ -1,0 +1,1 @@
+export { ReynoxLandingPage } from "./ReynoxLandingPage";

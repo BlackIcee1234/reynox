@@ -1,17 +1,19 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import {
   Activity,
   ArrowRight,
   Cpu,
   Factory,
-  Gauge,
+  Layers3,
+  MoveRight,
   ScanSearch,
   ShieldCheck,
   Sparkles,
+  Wrench,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { heroSlides } from "@/features/reynox/content";
 import { cn } from "@/lib/utils";
@@ -19,14 +21,50 @@ import { cn } from "@/lib/utils";
 const SLIDE_DELAY = 4600;
 
 const mobileHeroSlides = [
-  { id: "precision", Icon: ScanSearch, metric: "0.02", unit: "mm", glow: "#3a4efb66" },
-  { id: "speed", Icon: Gauge, metric: "27", unit: "%", glow: "#33a4fa66" },
-  { id: "uptime", Icon: ShieldCheck, metric: "99.2", unit: "%", glow: "#e3ff3b66" },
+  {
+    id: "diagnostico",
+    Icon: ScanSearch,
+    phase: "Fase 01",
+    title: "Diagnostico enterprise",
+    subtitle: "Riesgos, normativas y puntos criticos en una sola lectura.",
+    metric: "18",
+    unit: "%",
+    metricLabel: "menos retrabajo",
+    glow: "#3a4efb66",
+  },
+  {
+    id: "arquitectura",
+    Icon: Layers3,
+    phase: "Fase 02",
+    title: "Arquitectura de solucion",
+    subtitle: "Diseno modular para escalar sin detener la operacion.",
+    metric: "27",
+    unit: "%",
+    metricLabel: "menos tiempo a valor",
+    glow: "#33a4fa66",
+  },
+  {
+    id: "ejecucion",
+    Icon: Wrench,
+    phase: "Fase 03",
+    title: "Ejecucion controlada",
+    subtitle: "Implementacion por etapas con continuidad operativa.",
+    metric: "99.2",
+    unit: "%",
+    metricLabel: "uptime promedio",
+    glow: "#e3ff3b66",
+  },
 ];
 
 export function HeroSection() {
   const [current, setCurrent] = useState(0);
   const reduceMotion = useReducedMotion();
+  const mobileCardRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: mobileCardRef,
+    offset: ["start end", "end start"],
+  });
+  const cardLift = useTransform(scrollYProgress, [0, 1], [0, -24]);
 
   useEffect(() => {
     if (reduceMotion) return;
@@ -62,6 +100,8 @@ export function HeroSection() {
         <div className="lg:hidden">
           <div className="mx-auto max-w-sm">
             <motion.div
+              ref={mobileCardRef}
+              style={reduceMotion ? undefined : { y: cardLift }}
               className="glass-panel relative overflow-hidden rounded-[28px] border border-white/45 px-5 pb-5 pt-6"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
@@ -100,7 +140,19 @@ export function HeroSection() {
                   })()}
                 </div>
 
-                <div className="mt-6 flex items-end justify-center gap-1 text-[#252943]">
+                <div className="mt-5 text-center">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#5d6793]">
+                    {mobileHeroSlides[current].phase}
+                  </p>
+                  <h2 className="mt-1 text-xl font-semibold text-[#252943]">
+                    {mobileHeroSlides[current].title}
+                  </h2>
+                  <p className="mt-1 text-xs leading-relaxed text-[#626a8f]">
+                    {mobileHeroSlides[current].subtitle}
+                  </p>
+                </div>
+
+                <div className="mt-4 flex items-end justify-center gap-1 text-[#252943]">
                   <span className="text-5xl font-semibold leading-none">
                     {mobileHeroSlides[current].metric}
                   </span>
@@ -108,6 +160,9 @@ export function HeroSection() {
                     {mobileHeroSlides[current].unit}
                   </span>
                 </div>
+                <p className="mt-1 text-center text-[11px] font-medium uppercase tracking-[0.12em] text-[#58618a]">
+                  {mobileHeroSlides[current].metricLabel}
+                </p>
 
                 <div className="mt-5 grid grid-cols-3 gap-2">
                   {[Activity, Cpu, ShieldCheck].map((Icon, idx) => (
@@ -120,6 +175,14 @@ export function HeroSection() {
                   ))}
                 </div>
               </motion.div>
+
+              <div className="mt-4 h-1.5 w-full overflow-hidden rounded-full bg-[#cdd2e8]">
+                <motion.div
+                  className="h-full rounded-full bg-gradient-to-r from-[#3a4efb] to-[#33a4fa]"
+                  animate={{ width: `${((current + 1) / mobileHeroSlides.length) * 100}%` }}
+                  transition={{ duration: 0.35 }}
+                />
+              </div>
 
               <div className="mt-4 flex items-center justify-center gap-2">
                 {mobileHeroSlides.map((slide, index) => (
@@ -136,10 +199,34 @@ export function HeroSection() {
                 ))}
               </div>
 
-              <a href="#cotizacion" className="btn-primary mt-5 min-h-11 w-full text-base">
-                Cotizar ahora
-                <ArrowRight className="h-4 w-4" />
-              </a>
+              <div className="mt-5 grid grid-cols-2 gap-2">
+                <a href="#cotizacion" className="btn-primary min-h-11 w-full text-base">
+                  Cotizar ahora
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+                <a href="#proceso" className="btn-secondary min-h-11 w-full text-sm">
+                  Ver roadmap
+                  <MoveRight className="h-4 w-4" />
+                </a>
+              </div>
+
+              <div className="mt-4 rounded-2xl border border-[#25294315] bg-white/70 p-3">
+                <div className="flex items-center justify-between text-[10px] font-semibold uppercase tracking-[0.14em] text-[#64709a]">
+                  <span>Storyline</span>
+                  <span>{current + 1}/3</span>
+                </div>
+                <div className="mt-2 grid grid-cols-3 gap-2 text-[11px] font-medium text-[#4f587f]">
+                  <span className={cn("rounded-lg px-2 py-1 text-center", current >= 0 && "bg-[#edf0ff]")}>
+                    Audit
+                  </span>
+                  <span className={cn("rounded-lg px-2 py-1 text-center", current >= 1 && "bg-[#edf0ff]")}>
+                    Build
+                  </span>
+                  <span className={cn("rounded-lg px-2 py-1 text-center", current >= 2 && "bg-[#edf0ff]")}>
+                    Scale
+                  </span>
+                </div>
+              </div>
             </motion.div>
           </div>
         </div>
